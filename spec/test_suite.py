@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-sys.path.append("C:\\Users\\hawkgroup\\Documents\\visual studio 2015\\Projects\\rack_challenge\\PythonApplication1\\lib")
+sys.path.append("C:\\bin\\rack_code_challenge\\lib")
 from rack_store import *
 
 
@@ -9,8 +9,8 @@ class test_customers(unittest.TestCase):
 
     def setUp(self):
 
-        self.store = GroceryStore("inputFIles/ex1.txt")
-        self.store2 = GroceryStore("inputFIles/ex2.txt")
+        self.store = GroceryStore("inputFiles/ex1.txt")
+        self.store2 = GroceryStore("inputFiles/ex2.txt")
 
     def test_customer_type_input1(self):
         
