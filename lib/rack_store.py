@@ -102,8 +102,8 @@ class Cashier(object):
 
             if index == 0:
                 time_taken += each._decorated._arrived
-            else:
-                time_taken += each._decorated._arrived if each._decorated._arrived > time_taken else 0
+            #else:
+            #    time_taken += each._decorated._arrived if each._decorated._arrived > time_taken else 0
             
             #print("time_taken while in loop", time_taken, "customer #", index)
             time_taken += (each._decorated._items * self._time_per_item)
@@ -164,16 +164,20 @@ class TypeACustomer(object):
         
         if len(cashiers) == 1:
             cashiers[0].addCustomer(self)
+            return
         else:
             
             for index, each in enumerate(cashiers):
-                if index == 0:
+                if len(each._customers) == 0:
                     shortest = each
-                elif len(each._customers) < shortest:
+                    break
+                elif index == 0:
+                    shortest = each
+                elif len(each._customers) < len(shortest._customers):
                     shortest = each
             #end loop
 
-            each.addCustomer(self)
+            shortest.addCustomer(self)
     #end method
 
     def __repr__(self):
@@ -190,31 +194,32 @@ class TypeBCustomer(object):
 
     def pickLine(self, cashiers):
         
-        least_items = self.pick_shortest_line(cashiers)
-        print("least_items", least_items)
+        least_items = self.pick_least_items(cashiers)
+        #print("least_items", least_items)
         least_items.addCustomer(self)
 
     #end method
 
-    def pick_shortest_line(self, cashiers):
+    def pick_least_items(self, cashiers):
         #print("ALL CASHIERS", cashiers)
-        if len(cashiers) == 1:
+        if len(cashiers) == 1: # if only 1 register
             return cashiers[0]
         else:
 
             for index, each in enumerate(cashiers):
-                print(each)
+                #print(each)
+                
                 customers = each._customers
                 #print("index of cashiers", index, "customers", customers)
+
                 if len(customers) == 0:
                     least_items = each
-                    break   
+                    break
+                elif index == 0:
+                    least_items = each                    
                 else:
-                    if index == 0:
+                    if least_items._customers[-1]._decorated._items > each._customers[-1]._decorated._items:
                         least_items = each
-                    else:
-                        if least_items._customers[-1]._decorated._items < customers[-1]._decorated._items:
-                            least_items = each  
                         
             #end loop
 

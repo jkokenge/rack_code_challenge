@@ -50,11 +50,16 @@ class test_customers(unittest.TestCase):
 
         self.assertTrue(self.store._registers[0]._time_per_item == 2)
 
-        reg = self.store._registers[0]
-        #print("register", reg)
-        time_taken = reg.checkout()
-        print("*** time_taken scenario 1:", time_taken)
-        self.assertTrue( time_taken == 7 )
+        times_taken = []
+        reg = self.store._registers
+        
+        for each in reg:
+            times_taken.append( each.checkout() )
+        #end loop
+
+        print("*** time_taken scenario 1", max(times_taken))
+        self.assertTrue( max(times_taken) == 7 )
+
     #end method
 
 
@@ -106,14 +111,19 @@ class test_customers(unittest.TestCase):
         #print(self.store2._registers)
         self.assertTrue(self.store2._registers[1]._time_per_item == 2)
 
-        time_taken = 0
+        times_taken = []
         reg = self.store2._registers
         
         for each in reg:
-            time_taken += each.checkout()
-        print("*** time_taken scenario 2", time_taken)
-        self.assertTrue( time_taken == 13 )
+            times_taken.append( each.checkout() )
+        #end loop
+
+        print("*** time_taken scenario 2", max(times_taken))
+        self.assertTrue( max(times_taken) == 13 )
+
     #end method
+
+    ####### testing input file 3 begins here #######
 
 if __name__ == '__main__':
     unittest.main()
