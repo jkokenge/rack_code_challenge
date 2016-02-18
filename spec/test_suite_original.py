@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append("C:\\bin\\rack_code_challenge\\lib")
-from rack_store import *
+from rack_store_original import *
 
 
 class test_customers(unittest.TestCase):

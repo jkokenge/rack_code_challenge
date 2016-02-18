@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append("C:\\bin\\rack_code_challenge\\lib")
-from rack_store2 import *
+from rack_store_3 import *
 
 
 class test_customers(unittest.TestCase):
@@ -45,20 +45,20 @@ class test_customers(unittest.TestCase):
 
     def test_checkout_times_input1(self):
 
-        
         for each in self.store._customers:
+            print(each)
             register = each.pickLine(self.store._registers)
             register.checkout()
         #end loop
 
         self.assertTrue(self.store._registers[-1]._time_per_item == 2)
 
-        
+        times_taken = []
         reg = self.store._registers
         
-        #for each in reg:
-        #    print("arrived_at", each._arrival_times)
-        #    print("time_per_customer", each._time_per_customer)
+        for each in reg:
+            print("arrived_at", each._arrival_times)
+            print("time_per_customer", each._time_per_customer)
         #end loop
 
         #print("*** time_taken scenario 1", max(times_taken))
@@ -67,7 +67,7 @@ class test_customers(unittest.TestCase):
     #end method
 
 
-    ####### testing input file 2 begins here #######
+    ######## testing input file 2 begins here #######
 
 
     #def test_customer_type_input2(self):
@@ -107,29 +107,28 @@ class test_customers(unittest.TestCase):
     #    #print("store registers after getting customers", self.store2._registers)
     ##end method
 
-    def test_checkout_times_input2(self):
+    #def test_checkout_times_input2(self):
 
-        for each in self.store2._customers:
-            register = each.pickLine(self.store2._registers)
-            register.checkout()
-        #end loop
+    #    for each in self.store2._customers:
+    #        each.pickLine(self.store2._registers)
+    #    #end loop
 
-        #print(self.store2._registers)
-        self.assertTrue(self.store2._registers[-1]._time_per_item == 2)
+    #    #print(self.store2._registers)
+    #    self.assertTrue(self.store2._registers[-1]._time_per_item == 2)
 
-        times_taken = []
-        reg = self.store2._registers
+    #    times_taken = []
+    #    reg = self.store2._registers
         
-        for each in reg:
-        #    #times_taken.append( each.checkout() )
-            print("arrived_at", each._arrival_times)
-            print("time_per_customer", each._time_per_customer)
-        #end loop
+    #    for each in reg:
+    #        times_taken.append( each.checkout() )
+    #        #print("arrived_at", each._arrival_times)
+    #        #print("time_per_customer", each._time_per_customer)
+    #    #end loop
 
-        #print("*** time_taken scenario 2", max(times_taken))
-        #self.assertTrue( max(times_taken) == 13 )
+    #    print("*** time_taken scenario 2", max(times_taken))
+    #    self.assertTrue( max(times_taken) == 13 )
 
-    #end method
+    ##end method
 
 
     ######## testing input file 3 begins here #######
@@ -164,30 +163,28 @@ class test_customers(unittest.TestCase):
     #    #print("store registers after getting customers", self.store._registers[0])
     ##end method
 
-    def test_checkout_times_input3(self):
+    #def test_checkout_times_input3(self):
 
-        for each in self.store3._customers:
-            #print("customer", each)
-            register = each.pickLine(self.store3._registers)
-            register.checkout()
-        #end loop
+    #    for each in self.store3._customers:
+    #        #print("customer", each)
+    #        each.pickLine(self.store3._registers)
+    #    #end loop
+    #    #print("ALL CASHIERS", self.store3._registers)
+    #    self.assertTrue(self.store3._registers[-1]._time_per_item == 2)
 
-        #print("ALL CASHIERS", self.store3._registers)
-        self.assertTrue(self.store3._registers[-1]._time_per_item == 2)
-
-        times_taken = []
-        reg = self.store3._registers
+    #    times_taken = []
+    #    reg = self.store3._registers
         
-        #for each in reg:
-        #    #times_taken.append( each.checkout() )
-        #    print("arrived_at", each._arrival_times)
-        #    print("time_per_customer", each._time_per_customer)
-        #end loop
+    #    for each in reg:
+    #        times_taken.append( each.checkout() )
+    #        print("arrived_at", each._arrival_times)
+    #        print("time_per_customer", each._time_per_customer)
+    #    #end loop
 
-        #print("*** times_taken scenario 3", max(times_taken))
-        #self.assertTrue( max(times_taken) == 6 )
+    #    print("*** times_taken scenario 3", max(times_taken))
+    #    self.assertTrue( max(times_taken) == 6 )
 
-    #end method
+    ##end method
 
 if __name__ == '__main__':
     unittest.main()
