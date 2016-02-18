@@ -68,6 +68,26 @@ class GroceryStore(object):
             yield each
     #end method
 
+    def checkArrivalTime(self, cust):
+        
+        arrived = cust._decorated._arrived
+
+        for each in self: # each is a register here
+            print(each)
+            if len(each) == 0:# or len(each._time_per_customer) == 0:
+                continue
+            #end if
+            #print(each._time_per_customer)
+            first_customer_time_taken = each._time_per_customer[0]
+
+            if arrived >= (first_customer_time_taken - 1):
+                each.removeCustomer()
+            #end if
+
+        #end loop
+
+    #end method
+
     def calculateTimes(self):
 
         if len(self) == 1:
@@ -76,7 +96,7 @@ class GroceryStore(object):
 
             times = []
 
-            for each in self._registers:
+            for each in self:
                 times.append(sum(each._time_per_customer))
             #end loop
 
@@ -124,22 +144,11 @@ class Cashier(object):
     def checkout(self, cust):
 
         time_taken = 0        
-        time_taken += (cust._decorated._items * self._time_per_item)
+        time_taken += int(cust._decorated._items * self._time_per_item)
 
         if cust == self._store._customers[0]:
-            time_taken += cust._decorated._arrived
-        
-        if cust != self._customers[0]:
-            
-            # if this customer arrives after the first customer is done
-            if cust._decorated._arrived >= self._time_per_customer[0] - 1:
-                self.removeCustomer()
-            #end if
-
-            #for each in self._store: # each here is a register
-            # TO DO: SOMEHWERE (probably not here) I need to iterate through all the registers
-            #        and check if the current customer's arrival time is after any registers
-            #        first customer's time_taken
+            time_taken += int(cust._decorated._arrived)
+        #end if
 
         self._time_per_customer.append(time_taken)
         
