@@ -68,6 +68,20 @@ class GroceryStore(object):
             yield each
     #end method
 
+    def calculateTimes(self):
+
+        if len(self) == 1:
+            return sum(self._registers[0]._time_per_customer)
+        else:
+
+            times = []
+
+            for each in self._registers:
+                times.append(sum(each._time_per_customer))
+            #end loop
+
+            return max(times)
+    #end method
 
     def __repr__(self):
         return "Registers: {0}, Customers: {1}, Time Taken: {2}".format(self._registers, self._customers, self._time_taken)
@@ -84,6 +98,7 @@ class Cashier(object):
         self._time_per_customer = []
         self._arrival_times = []
         self._store = store
+        self._isEmpty = True
     #end constructor
 
     def addCustomer(self, c):
@@ -92,6 +107,10 @@ class Cashier(object):
 
     def removeCustomer(self):
         del self._customers[0]
+    #end method
+
+    def isEmpty(self):
+        return True if len(self._customers) == 0 else False
     #end method
 
     def __len__(self):
@@ -104,14 +123,24 @@ class Cashier(object):
 
     def checkout(self, cust):
 
-        time_taken = 0
-
-        if cust == self._customers[0]:
-            time_taken += cust._decorated._arrived
-        else:
-            pass # what to do if the current customer is NOT first in line
-        
+        time_taken = 0        
         time_taken += (cust._decorated._items * self._time_per_item)
+
+        if cust == self._store._customers[0]:
+            time_taken += cust._decorated._arrived
+        
+        if cust != self._customers[0]:
+            
+            # if this customer arrives after the first customer is done
+            if cust._decorated._arrived >= self._time_per_customer[0] - 1:
+                self.removeCustomer()
+            #end if
+
+            #for each in self._store: # each here is a register
+            # TO DO: SOMEHWERE (probably not here) I need to iterate through all the registers
+            #        and check if the current customer's arrival time is after any registers
+            #        first customer's time_taken
+
         self._time_per_customer.append(time_taken)
         
     #end method
@@ -127,8 +156,13 @@ class Cashier(object):
 class TrainingCashier(Cashier):
 
     def __init__(self, num, store):
-        super(TrainingCashier, self).__init__(num, store)
+        self._num = int(num)
         self._time_per_item = 2
+        self._customers = []
+        self._time_per_customer = []
+        self._arrival_times = []
+        self._store = store
+        self._isEmpty = True
     #end constructor
 
 #end class
@@ -166,7 +200,7 @@ class Customer(object):
 
     def getLineWithLeastItems(self, cashiers):
 
-        shortest_line = self.getShortestLine()
+        shortest_line = self.getShortestLine(cashiers)
 
         if shortest_line.isEmpty():
             least_items = shortest_line
@@ -177,7 +211,7 @@ class Customer(object):
                     least_items = each
                 else:
 
-                    if least_items._customers[-1]._items > each._customers[-1]._items:
+                    if least_items._customers[-1]._decorated._items > each._customers[-1]._decorated._items:
                         least_items = each
                 #end if else
             #end loop
@@ -204,7 +238,7 @@ class TypeACustomer(object):
             return cashiers[0]
         else:
             
-            shortest = self._decorated.getShortestLine()
+            shortest = self._decorated.getShortestLine(cashiers)
             shortest.addCustomer(self)
             return shortest
     #end method

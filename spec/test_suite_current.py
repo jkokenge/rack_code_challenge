@@ -47,10 +47,11 @@ class test_customers(unittest.TestCase):
             register.checkout(each)
         #end loop
 
-        for each in self.store:
-            print(each)
-                
-        #self.assertTrue( max(times_taken) == 7 )
+        #for each in self.store:
+        #    print(each)
+        
+        #print("time taken", self.store.calculateTimes())
+        self.assertTrue( self.store.calculateTimes() == 7 )
 
     #end method
 
@@ -58,65 +59,72 @@ class test_customers(unittest.TestCase):
     ######## testing input file 2 begins here #######
 
 
-    #def test_customer_type_input2(self):
+    def test_customer_type_input2(self):
         
-    #    custs = self.store2._customers
+        custs = self.store2._customers
 
-    #    for index, each in enumerate(custs):
+        for index, each in enumerate(custs):
             
-    #        if index % 2 == 0:
-    #            self.assertTrue( each._decorated._type == 'A' )
-    #        else:
-    #            self.assertTrue( each._decorated._type == 'B' )
+            if index % 2 == 0:
+                self.assertTrue( each._decorated._type == 'A' )
+            else:
+                self.assertTrue( each._decorated._type == 'B' )
 
-    ##end method
+    #end method
 
-    #def test_registers_input2(self):
+    def test_registers_input2(self):
 
-    #    self.assertTrue( len(self.store2._registers) == 2 )
-    #    self.assertTrue( isinstance(self.store2._registers[-1], TrainingCashier) )
-    ##end method
+        self.assertTrue( len(self.store2._registers) == 2 )
+        self.assertTrue( isinstance(self.store2._registers[-1], TrainingCashier) )
+    #end method
 
-    #def test_customer_behavior_input2(self):
+    def test_customer_behavior_input2(self):
 
-    #    self.assertTrue( len(self.store2._customers) == 5 )
-    #    self.assertTrue( type(self.store2._customers) == list )
-    #    self.assertTrue( type(self.store2._registers) == list )
+        self.assertTrue( len(self.store2._customers) == 5 )
+        self.assertTrue( type(self.store2._customers) == list )
+        self.assertTrue( type(self.store2._registers) == list )
+        self.assertTrue(self.store._registers[-1]._time_per_item == 2)
 
-    #    for each in self.store2._customers:
-    #        each.pickLine(self.store2._registers)
-    #    #end loop
+        for each in self.store2._customers:
+            register = each.pickLine(self.store2._registers)
+            self.assertTrue(each in register)
+        #end loop
 
-    #    cust = list(self.store2._customers)
+    #end method
 
-    #    for each in self.store2._customers:
-    #        self.assertTrue( each in cust )
+    def test_customer_behavior2_input2(self):
 
-    #    #print("store registers after getting customers", self.store2._registers)
-    ##end method
+        for index, each in enumerate(self.store2._customers):
+            
+            register = each.pickLine(self.store2._registers)
+            
+            if index == 0:
+                self.assertTrue(self.store2._customers[0] in self.store2._registers[0])
+            elif index == 1:
+                self.assertTrue(self.store2._customers[1] in self.store2._registers[1])
+            elif index == 2:
+                self.assertTrue(self.store2._customers[2] in self.store2._registers[0])
+            elif index == 3:
+                self.assertTrue(self.store2._customers[3] in self.store2._registers[1])
+            elif index == 4:
+                self.assertTrue(self.store2._customers[4] in self.store2._registers[0])
 
-    #def test_checkout_times_input2(self):
+            register.checkout(each)
 
-    #    for each in self.store2._customers:
-    #        each.pickLine(self.store2._registers)
-    #    #end loop
+    def test_checkout_times_input2(self):
 
-    #    #print(self.store2._registers)
-    #    self.assertTrue(self.store2._registers[-1]._time_per_item == 2)
+        for each in self.store2._customers:
+            register = each.pickLine(self.store2._registers)
+            register.checkout(each)
+        #end loop
 
-    #    times_taken = []
-    #    reg = self.store2._registers
-        
-    #    for each in reg:
-    #        times_taken.append( each.checkout() )
-    #        #print("arrived_at", each._arrival_times)
-    #        #print("time_per_customer", each._time_per_customer)
-    #    #end loop
+        for each in self.store2:
+            print(each)
 
-    #    print("*** time_taken scenario 2", max(times_taken))
-    #    self.assertTrue( max(times_taken) == 13 )
+        print("time taken", self.store2.calculateTimes())
+        self.assertTrue( self.store2.calculateTimes() == 13 )
 
-    ##end method
+    #end method
 
 
     ######## testing input file 3 begins here #######
