@@ -1,62 +1,97 @@
 
 
+class Helper(object):
+
+    @staticmethod
+    def getFileContents(file_path):
+
+        with open(file_path, "r") as f:
+            return f.read().splitlines()
+    #end method
+
+    @staticmethod
+    def customerType(type, arrived, items):
+
+        if type == 'A':
+            return TypeACustomer(type, arrived, items)
+        elif type == 'B':
+            return TypeBCustomer(type, arrived, items)
+
+    #end method
+
+#end class
+
+
 class GroceryStore(object):
-    """Main class that controlls the other classes"""
-
-    def __init__(self, fp):
-
+    
+    def __init__(self, lst):
+        
         self._registers = []
         self._customers = []
-
-        contents = self.getFileContents(fp)
+        self._elapsed_time = 0
         
-        for i in range(int(contents[0])):
+        for i in range(int(lst[0])):
 
-            if i == int(contents[0]) - 1:
+            if i == int(lst[0]) - 1:
                 self._registers.append(TrainingCashier(i, self))
             else:
                 self._registers.append(Cashier(i, self))
 
-        del contents[0]
+        del lst[0]
         
-        for each in contents:
-            
+        for each in lst:            
             type, arrived, items = tuple(each.split())
-            
-            try:
-
-                c = Customer(type.strip(), arrived.strip(), items.strip())
-
-                if type == 'A':
-                    self._customers.append(TypeACustomer(c))
-                elif type == 'B':
-                    self._customers.append(TypeBCustomer(c))
-                
-            except Exception as err:
-                print(err)
+            self._customers.append(Helper.customerType(type, arrived, items))
         # end loop
+
     # end constructor
+    
+    def increment_time(self):
+        self._elapsed_time += 1
+        return self._elapsed_time
+    #end method    
 
-    @property
-    def customers(self):
-        return self._customers
-    @customers.setter
-    def customers(self, c):
-        self._customers = c
-    #end property customers
+    def checkArrivals(self, timeVal):
 
-    @property
-    def registers(self):
-        return self._registers
-    @registers.setter
-    def registers(self, r):
-        self._registers = r
-    #end property registers
+        comeIn = []
 
-    def getFileContents(self, file_path):
+        for each in self._customers:
 
-        with open(file_path, "r") as f:
-            return f.read().splitlines()
+            if timeVal == each._arrived:
+                comeIn.append(each)
+            #end if
+        #end loop
+
+        return comeIn
+    #end method
+
+    def whoPicks(self, custList = []):
+        
+        if len(custList) == 1:
+            return custList[0]
+        elif len(custList) > 1:
+            
+            itemSort = sorted(custList, key = lambda each: each._items)
+            #print("itemSort {0}".format(itemSort))
+            if itemSort[0]._items == itemSort[1]._items:
+                typeSort = sorted(custList, key = lambda each: each._type)
+                return typeSort[0]
+            #end if
+
+            return itemSort[0]
+
+    #end method
+
+    def noCustomers(self):
+
+        empties = []
+        for each in self:
+            if each.isEmpty():
+                empties.append(True)
+            else:
+                empties.append(False)
+        #end loop
+        return False if False in empties else True
     #end method
 
     def __len__(self):
@@ -68,45 +103,12 @@ class GroceryStore(object):
             yield each
     #end method
 
-    def checkArrivalTime(self, cust):
-        
-        arrived = cust._decorated._arrived
-
-        for each in self: # each is a register here
-            print(each)
-            if len(each) == 0:# or len(each._time_per_customer) == 0:
-                continue
-            #end if
-            #print(each._time_per_customer)
-            first_customer_time_taken = each._time_per_customer[0]
-
-            if arrived >= (first_customer_time_taken - 1):
-                each.removeCustomer()
-            #end if
-
-        #end loop
-
-    #end method
-
-    def calculateTimes(self):
-
-        if len(self) == 1:
-            return sum(self._registers[0]._time_per_customer)
-        else:
-
-            times = []
-
-            for each in self:
-                times.append(sum(each._time_per_customer))
-            #end loop
-
-            return max(times)
-    #end method
-
     def __repr__(self):
-        return "Registers: {0}, Customers: {1}, Time Taken: {2}".format(self._registers, self._customers, self._time_taken)
+        return "Registers: \n\t{0} \nCustomers: \n\t{1} \nElapsed Time: \n\t{2}".format(
+            self._registers, self._customers, self._elapsed_time)
+    #end method
 
-# end class
+#end class
 
 
 class Cashier(object):
@@ -126,11 +128,12 @@ class Cashier(object):
     #end method
 
     def removeCustomer(self):
+        self._store._customers.remove(self._customers[0])
         del self._customers[0]
     #end method
 
     def isEmpty(self):
-        return True if len(self._customers) == 0 else False
+        return True if len(self) == 0 else False
     #end method
 
     def __len__(self):
@@ -141,22 +144,77 @@ class Cashier(object):
         return cust in self._customers
     #end method
 
-    def checkout(self, cust):
+    def calculateLeave(self, cust):
+        
+        time_left = 0
+        arrived = cust._arrived
 
-        time_taken = 0        
-        time_taken += int(cust._decorated._items * self._time_per_item)
+        if self.isFirstHere(cust): # if it's the first customer in line, include arrival time
+            time_left += arrived
+            time_left += ( cust._items * self._time_per_item )
+            
+        else:
+            
+            last_customer_left = self._time_per_customer[-1]
+            
+            if arrived < last_customer_left: # if they arrived before last customer left
+                time_left += last_customer_left
+                time_left += ( cust._items * self._time_per_item )
+                
+            else: # if they arrived after last customer left
+                time_left += (arrived - last_customer_left) + ( cust._items * self._time_per_item )
+            #end if else
+        #end if else
 
-        if cust == self._store._customers[0]:
-            time_taken += int(cust._decorated._arrived)
+        self._time_per_customer.append(time_left)
+        return time_left
+
+    #end method
+
+    def isFirstHere(self, cust):
+        
+        num_registers = len(self._store)
+
+        for index, each in enumerate(self._store._customers):
+
+            if index < num_registers:
+                if cust == each:
+                    return True
+            #end if
+        #end loop
+
+        return False
+
+    #end method
+
+    def checkout(self):
+        
+        #time_left = self.calculateLeave(cust)
+
+        first_customer = self._customers[0]
+        print("FIRST CUSTOMER {0} id is {1}".format(first_customer, id(first_customer)))
+        if first_customer is None:
+            return
+
+        if isinstance(self, TrainingCashier):
+            first_customer._items -= 0.5
+        elif isinstance(self, Cashier):
+            first_customer._items -= 1
+
+        if first_customer._items == 0:
+            print("CUSTOMER LEAVING {}".format(first_customer))
+            self.calculateLeave(first_customer)
+            self.removeCustomer()
+            
         #end if
 
-        self._time_per_customer.append(time_taken)
+        #return time_left
         
     #end method
 
     def __repr__(self):
         return "Cashier number {0}, Time per Item {1}, Customers {2}, Time Per Customer {3}".format(
-            self._num, self._time_per_item, self._customers, self._time_per_customer)
+            self._num+1, self._time_per_item, self._customers, self._time_per_customer)
     #end method
 
 #end class
@@ -186,7 +244,7 @@ class Customer(object):
     #end constructor
 
     def pickLine(self, cashiers):
-        raise NotImplementedError("Not Implemented Here!")
+        raise NotImplementedError("Implemented in Subclasses")
     #end method
 
     def getShortestLine(self, cashiers):
@@ -220,7 +278,7 @@ class Customer(object):
                     least_items = each
                 else:
 
-                    if least_items._customers[-1]._decorated._items > each._customers[-1]._decorated._items:
+                    if least_items._customers[-1]._items > each._customers[-1]._items:
                         least_items = each
                 #end if else
             #end loop
@@ -229,15 +287,33 @@ class Customer(object):
         return least_items
     #end method
 
+    def compareItems(self, other):
+        return 1 if self._items > other._items else 0
+    #end method
+
+    def compareType(self, other):
+        return 1 if self._type > other._type else 0
+    #end method
+
+    def __eq__(self, other):
+        return 1 if self._type == other._type and self._arrived == other._arrived \
+            and self._items == other._items else 0
+    #end method
+
+    def __len__(self):
+        return len(self._items)
+    #end method
+
     def __repr__(self):
         return "Customer type {0}, arrived at {1} minutes, with {2} items".format(self._type, self._arrived, self._items)
 
 #end class
 
-class TypeACustomer(object):
 
-    def __init__(self, decorated = None):
-        self._decorated = decorated
+class TypeACustomer(Customer):
+
+    def __init__(self, type = None, arrived = None, items = None):
+        return super(TypeACustomer, self).__init__(type, arrived, items)
     #end constructor
 
     def pickLine(self, cashiers):
@@ -247,21 +323,18 @@ class TypeACustomer(object):
             return cashiers[0]
         else:
             
-            shortest = self._decorated.getShortestLine(cashiers)
+            shortest = self.getShortestLine(cashiers)
             shortest.addCustomer(self)
             return shortest
     #end method
 
-    def __repr__(self):
-        return "Customer type {0}, arrived at {1} minutes, with {2} items".format(self._decorated._type, self._decorated._arrived, self._decorated._items)
-
 #end class
 
 
-class TypeBCustomer(object):
+class TypeBCustomer(Customer):
 
-    def __init__(self, decorated = None):
-        self._decorated = decorated
+    def __init__(self, type = None, arrived = None, items = None):
+        return super(TypeBCustomer, self).__init__(type, arrived, items)
     #end constructor
 
     def pickLine(self, cashiers):
@@ -271,20 +344,9 @@ class TypeBCustomer(object):
             return cashires[0]
         else:
             
-            least_items = self._decorated.getLineWithLeastItems(cashiers)
+            least_items = self.getLineWithLeastItems(cashiers)
             least_items.addCustomer(self)
             return least_items
     #end method
 
-    def __repr__(self):
-        return "Customer type {0}, arrived at {1} minutes, with {2} items".format(self._decorated._type, self._decorated._arrived, self._decorated._items)
-
 #end class
-
-
-def main():
-    str1 = GroceryStore("inputFiles/ex1.txt")
-    print(str1)
-
-if __name__ == "__main__":
-    main()
