@@ -7,10 +7,21 @@ Table Of Contents:
     5. TypeBCustomer
 """
 
+
 class Helper(object):
+
+    """ !1. Helper Methods
+            a.) getFileContents : takes filePath and returns a list of the contents
+            b.) customerType : takes a tuple of customer information and returns correct
+                customer type
+            c.) getRegisters : takes an int and returns a list of Cashiers with the
+                last one being a training Cashier"""
 
     @staticmethod
     def getFileContents(file_path):
+
+        """ @param file_path : String
+            @return list """
 
         with open(file_path, "r") as f:
             return f.read().splitlines()
@@ -18,6 +29,11 @@ class Helper(object):
 
     @staticmethod
     def customerType(type, arrived, items):
+
+        """ @param type: String
+            @param arrived: int
+            @param items: int
+            @return TypeACustomer or TypeBCustomer """
 
         if type == 'A':
             return TypeACustomer(type, arrived, items)
@@ -27,15 +43,19 @@ class Helper(object):
     #end method
 
     @staticmethod
-    def getRegisters(self, item):
+    def getRegisters(item, store):
+
+        """ @param item : int
+            @param store : GroceryStore
+            @return list of Cashier"""
         
         registers = []
         for i in range(item):
 
             if i == int(item) - 1:
-                registers.append(TrainingCashier(i, self))
+                registers.append(TrainingCashier(i, store))
             else:
-                registers.append(Cashier(i, self))
+                registers.append(Cashier(i, store))
             #end if
         #end loop
         return registers
@@ -46,13 +66,42 @@ class Helper(object):
 
 class GroceryStore(object):
 
-    def __init__(self, registers, customers):
+    """ !2.) GroceryStore Methods 
+            a.) __init__ : takes list of Cashiers and list of Customers
+            b.) checkArrivals : takes a timeValue and a list of Customers
+                and returns a list of Customers who are getting in line
+            c.) whoPicks : takes a list of Customers who are to get in line
+                and checks the number of items and type of customer
+                to determine which customer gets in line first 
+            d.) incrementTime: increments the elapsed time by 1 minute """
+
+    def __init__(self, registers = [], customers = []):
         self._registers = registers
         self._customers = customers
         self._elapsed_time = 0
     #end constructor
 
-    def checkArrivals(self, timeVal, custList = []):
+    @property
+    def registers(self):
+        return self._registers
+    @registers.setter
+    def registers(self, regs = []):
+        self._registers = regs
+    #end property registers
+
+    @property
+    def customers(self):
+        return self._customers
+    @customers.setter
+    def customers(self, custs = []):
+        self._customers = custs
+    #end property customers
+
+    def checkArrivals(self, timeVal = 1, custList = []):
+
+        """ @param timeVal : int
+            @param custList : list of Customer 
+            @return comeIn : list of Customer """
 
         comeIn = []
 
@@ -67,6 +116,9 @@ class GroceryStore(object):
     #end method
 
     def whoPicks(self, custList = []):
+
+        """ @param custList: list
+            @return Customer or False """
         
         if len(custList) == 1:
             return custList[0]
@@ -80,7 +132,14 @@ class GroceryStore(object):
             #end if
 
             return itemSort[0]
+        else:
+            return False
 
+    #end method
+
+    def incrementTime(self):
+        self._elapsed_time += 1
+        return self._elapsed_time
     #end method
 
     def __len__(self):
@@ -102,6 +161,15 @@ class GroceryStore(object):
 
 class Customer(object):
 
+    """ !3.) Customer Methods
+            a.) __init__ : takes a type, an arrival time, and a number of items
+            b.) pickLine : not implemented here but will vary depending on
+                customer type
+            c.) getShortestLine : takes a list of Cashiers and returns the line
+                with the fewest customers in it
+            d.) getLineWithLeastItems : takes a list of Cashiers and returns the
+                line where the last customer has the fewest items """
+
     def __init__(self, type = None, arrived = None, items = None):
         self._type = type
         self._arrived = int(arrived)
@@ -113,6 +181,9 @@ class Customer(object):
     #end method
 
     def getShortestLine(self, cashiers):
+
+        """ @param cashiers : list
+            @return shortest : Cashier """
 
         if len(cashiers) == 1:  # there is only 1 line to get in
             shortest = cashiers[0]
@@ -131,6 +202,9 @@ class Customer(object):
     #end method
 
     def getLineWithLeastItems(self, cashiers):
+
+        """ @param cashiers : list of Cashier
+            @return least_items : Cashier """
 
         shortest_line = self.getShortestLine(cashiers)
 
@@ -162,7 +236,8 @@ class Customer(object):
     #end method
 
     def __repr__(self):
-        return "Customer type {0}, arrived at {1} minutes, with {2} items".format(self._type, self._arrived, self._items)
+        return "Customer type {0}, arrived at {1} minutes, with {2} items remaining".format(
+            self._type, self._arrived, self._items)
 
 #end class
 
@@ -174,14 +249,15 @@ class TypeACustomer(Customer):
     #end constructor
 
     def pickLine(self, cashiers):
+
+        """ @param cashiers: list of Cashier
+            @return shortest : Cashier """
         
         if len(cashiers) == 1:  # if only 1 cashier
-            cashiers[0].addCustomer(self)
             return cashiers[0]
         else:
             
             shortest = self.getShortestLine(cashiers)
-            shortest.addCustomer(self)
             return shortest
     #end method
 
@@ -195,14 +271,15 @@ class TypeBCustomer(Customer):
     #end constructor
 
     def pickLine(self, cashiers):
+
+        """ @param cashiers: list of Cashier
+            @return least_items: Cashier """
         
         if len(cashiers) == 1:  # if only 1 cashier
-            cashiers[0].addCustomer(self)
             return cashires[0]
         else:
             
             least_items = self.getLineWithLeastItems(cashiers)
-            least_items.addCustomer(self)
             return least_items
     #end method
 
@@ -286,33 +363,26 @@ class Cashier(object):
     #end method
 
     def checkout(self):
-        
-        #time_left = self.calculateLeave(cust)
 
         first_customer = self._customers[0]
-        print("FIRST CUSTOMER {0} id is {1}".format(first_customer, id(first_customer)))
-        if first_customer is None:
-            return
+        current_time = self._store._elapsed_time
+        
+        if current_time != first_customer._arrived:
 
-        if isinstance(self, TrainingCashier):
-            first_customer._items -= 0.5
-        elif isinstance(self, Cashier):
-            first_customer._items -= 1
-
-        if first_customer._items == 0:
-            print("CUSTOMER LEAVING {}".format(first_customer))
-            self.calculateLeave(first_customer)
-            self.removeCustomer()
+            time_since_arrival = current_time - first_customer._arrived
             
-        #end if
 
-        #return time_left
+            if time_since_arrival % self._time_per_item == 0:
+                first_customer._items -= 1
+
+                if first_customer._items == 0:
+                    self.removeCustomer()
         
     #end method
 
     def __repr__(self):
-        return "Cashier number {0}, Time per Item {1}, Customers {2}, Time Per Customer {3}".format(
-            self._num+1, self._time_per_item, self._customers, self._time_per_customer)
+        return "Cashier number {0}, Time per Item {1}, Customers {2}".format(
+            self._num+1, self._time_per_item, self._customers)
     #end method
 
 #end class
