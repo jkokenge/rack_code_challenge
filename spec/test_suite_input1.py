@@ -92,28 +92,30 @@ class test_customers(unittest.TestCase):
 
         register.checkout()
         print("currentTime {}".format(currentTime))
+        print(register._customers[0]._items)
         self.assertTrue( register._customers[0]._items == 1)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 4 )
         register.checkout()
         print("currentTime {}".format(currentTime))
+        
         self.assertTrue( register._customers[0]._items == 1)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 5 )
         register.checkout()
         print("currentTime {}".format(currentTime))
-        print( register._customers )
+        #print( register._customers )
         self.assertTrue( register._customers[0] == self.store.customers[0])
-        print(self.store.customers[0])
+        #print(self.store.customers[0])
         
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 6 )
         register.checkout()
         print("currentTime {}".format(currentTime))
         print( register._customers )
-        #self.assertTrue( register._customers[0]._items == 1)
+        self.assertTrue( register._customers[0]._items == 1)
 
     #end method
 
