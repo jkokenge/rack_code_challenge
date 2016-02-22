@@ -319,58 +319,15 @@ class Cashier(object):
         return cust in self._customers
     #end method
 
-    def calculateLeave(self, cust):
-        
-        time_left = 0
-        arrived = cust._arrived
-
-        if self.isFirstHere(cust): # if it's the first customer in line, include arrival time
-            time_left += arrived
-            time_left += ( cust._items * self._time_per_item )
-            
-        else:
-            
-            last_customer_left = self._time_per_customer[-1]
-            
-            if arrived < last_customer_left: # if they arrived before last customer left
-                time_left += last_customer_left
-                time_left += ( cust._items * self._time_per_item )
-                
-            else: # if they arrived after last customer left
-                time_left += (arrived - last_customer_left) + ( cust._items * self._time_per_item )
-            #end if else
-        #end if else
-
-        self._time_per_customer.append(time_left)
-        return time_left
-
-    #end method
-
-    def isFirstHere(self, cust):
-        
-        num_registers = len(self._store)
-
-        for index, each in enumerate(self._store._customers):
-
-            if index < num_registers:
-                if cust == each:
-                    return True
-            #end if
-        #end loop
-
-        return False
-
-    #end method
-
     def checkout(self):
 
         first_customer = self._customers[0]
         current_time = self._store._elapsed_time
         
+        #TO DO: figure out how to ensure transition to new customer doesn't automatically remove an item
         if current_time != first_customer._arrived:
 
             time_since_arrival = current_time - first_customer._arrived
-            
 
             if time_since_arrival % self._time_per_item == 0:
                 first_customer._items -= 1
