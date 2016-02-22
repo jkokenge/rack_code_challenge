@@ -114,8 +114,15 @@ class test_customers(unittest.TestCase):
         self.assertTrue( currentTime == 6 )
         register.checkout()
         print("currentTime {}".format(currentTime))
-        print( register._customers )
+        #print( register._customers )
         self.assertTrue( register._customers[0]._items == 1)
+
+        currentTime = self.store.incrementTime()
+        self.assertTrue( currentTime == 7 )
+        register.checkout()
+        print("currentTime {}".format(currentTime))
+
+        self.assertTrue( self.store.isEmpty() == True )
 
     #end method
 

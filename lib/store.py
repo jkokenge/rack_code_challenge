@@ -97,6 +97,10 @@ class GroceryStore(object):
         self._customers = custs
     #end property customers
 
+    def isEmpty(self):
+        return True if len(self.customers) == 0 else False
+    #end method
+
     def checkArrivals(self, timeVal = 1, custList = []):
 
         """ @param timeVal : int
@@ -303,6 +307,7 @@ class Cashier(object):
     #end method
 
     def removeCustomer(self):
+        self._time_per_customer.append(self._store._elapsed_time)
         self._store._customers.remove(self._customers[0])
         del self._customers[0]
     #end method
@@ -323,17 +328,33 @@ class Cashier(object):
 
         first_customer = self._customers[0]
         current_time = self._store._elapsed_time
+        remove_item = False
         
         #TO DO: figure out how to ensure transition to new customer doesn't automatically remove an item
         if current_time != first_customer._arrived:
 
-            time_since_arrival = current_time - first_customer._arrived
+            if len(self._time_per_customer) > 0:
+                
+                time_since_last_left = current_time - self._time_per_customer[-1]
 
-            if time_since_arrival % self._time_per_item == 0:
+                if time_since_last_left % self._time_per_item == 0:
+                    remove_item = True
+
+            else:
+
+                time_since_arrival = current_time - first_customer._arrived
+
+                if time_since_arrival % self._time_per_item == 0:
+                    remove_item = True
+                #end if
+            #end if/else
+
+            if remove_item:    
                 first_customer._items -= 1
 
                 if first_customer._items == 0:
                     self.removeCustomer()
+                #end if
         
     #end method
 
