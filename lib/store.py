@@ -6,7 +6,7 @@ Table Of Contents:
     4. TypeACustomer
     5. TypeBCustomer
 """
-
+import os
 
 class Helper(object):
 
@@ -23,8 +23,11 @@ class Helper(object):
         """ @param file_path : String
             @return list """
 
-        with open(file_path, "r") as f:
-            return f.read().splitlines()
+        if os.path.isfile(file_path):
+            with open(file_path, "r") as f:
+                return f.read().splitlines()
+        else:
+            raise IOError("Not a valid File")
     #end method
 
     @staticmethod
@@ -230,10 +233,10 @@ class Customer(object):
         return least_items
     #end method
 
-    def __eq__(self, other):
-        return True if self._type == other._type and self._arrived == other._arrived \
-            and self._items == other._items else False
-    #end method
+    #def __eq__(self, other):
+    #    return True if self._type == other._type and self._arrived == other._arrived \
+    #        and self._items == other._items else False
+    ##end method
 
     def __len__(self):
         return self._items
