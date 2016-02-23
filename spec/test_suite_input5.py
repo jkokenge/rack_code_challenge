@@ -78,8 +78,8 @@ class test_customers(unittest.TestCase):
 
             #print("elapsed time is {0} \n{1}".format(ct, self.store))
 
-            #if ct < 16:
-            #    x = raw_input("")
+            if ct < 16:
+                x = raw_input("")
 
         #end loop
 
