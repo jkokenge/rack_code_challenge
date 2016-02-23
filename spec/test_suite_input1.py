@@ -64,7 +64,7 @@ class test_customers(unittest.TestCase):
 
         #TO DO implement the correct checkout process
         register.checkout()
-        print("currentTime {}".format(currentTime))
+        #print("currentTime {}".format(currentTime))
         self.assertTrue( whoPicks._items == 2)
 
         currentTime = self.store.incrementTime()
@@ -79,50 +79,72 @@ class test_customers(unittest.TestCase):
         self.assertTrue( register == self.store.registers[0] )
 
         register.addCustomer(whoPicks)
-        print(register._customers)
+        #print(register._customers)
         self.assertTrue( register._customers[1] == whoPicks )
         self.assertTrue( whoPicks in register )
 
         register.checkout()
-        print("currentTime {}".format(currentTime))
+        #print("currentTime {}".format(currentTime))
         self.assertTrue( register._customers[0]._items == 2)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 3 )
 
         register.checkout()
-        print("currentTime {}".format(currentTime))
-        print(register._customers[0]._items)
+        #print("currentTime {}".format(currentTime))
+        #print(register._customers[0]._items)
         self.assertTrue( register._customers[0]._items == 1)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 4 )
         register.checkout()
-        print("currentTime {}".format(currentTime))
+        #print("currentTime {}".format(currentTime))
         
         self.assertTrue( register._customers[0]._items == 1)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 5 )
         register.checkout()
-        print("currentTime {}".format(currentTime))
-        #print( register._customers )
+        #print("currentTime {}".format(currentTime))
+        ##print( register._customers )
         self.assertTrue( register._customers[0] == self.store.customers[0])
-        #print(self.store.customers[0])
+        ##print(self.store.customers[0])
         
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 6 )
         register.checkout()
-        print("currentTime {}".format(currentTime))
-        #print( register._customers )
+        #print("currentTime {}".format(currentTime))
+        ##print( register._customers )
         self.assertTrue( register._customers[0]._items == 1)
 
         currentTime = self.store.incrementTime()
         self.assertTrue( currentTime == 7 )
         register.checkout()
-        print("currentTime {}".format(currentTime))
+        #print("currentTime {}".format(currentTime))
 
         self.assertTrue( self.store.isEmpty() == True )
+
+    #end method
+
+    def test_integration(self):
+        
+        while not self.store.isEmpty():
+            
+            ct = self.store.incrementTime()
+            currentArrivals = self.store.checkArrivals(ct, self.store.customers)
+            whoPicks = self.store.whoPicks(currentArrivals)
+
+            if whoPicks:
+                register = whoPicks.pickLine(self.store.registers)
+                register.addCustomer(whoPicks)
+            else:
+                register = self.store._registers[0]
+
+            register.checkout()
+
+        #end loop
+
+        print("Finished at: t={0} minutes".format(self.store._elapsed_time))
 
     #end method
 

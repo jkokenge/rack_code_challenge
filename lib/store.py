@@ -132,10 +132,10 @@ class GroceryStore(object):
             
             if itemSort[0]._items == itemSort[1]._items:
                 typeSort = sorted(custList, key = lambda each: each._type)
-                return typeSort[0]
+                return typeSort
             #end if
 
-            return itemSort[0]
+            return itemSort
         else:
             return False
 
@@ -156,7 +156,7 @@ class GroceryStore(object):
     #end method
 
     def __repr__(self):
-        return "Registers: \n\t{0} \nCustomers: \n\t{1} \nElapsed Time: \n\t{2}".format(
+        return "Registers: \n\t{0} \n\nCustomers: \n\t{1} \n\nElapsed Time: \n\t{2}".format(
             self._registers, self._customers, self._elapsed_time)
     #end method
 
@@ -231,12 +231,12 @@ class Customer(object):
     #end method
 
     def __eq__(self, other):
-        return 1 if self._type == other._type and self._arrived == other._arrived \
-            and self._items == other._items else 0
+        return True if self._type == other._type and self._arrived == other._arrived \
+            and self._items == other._items else False
     #end method
 
     def __len__(self):
-        return len(self._items)
+        return self._items
     #end method
 
     def __repr__(self):
@@ -325,6 +325,9 @@ class Cashier(object):
     #end method
 
     def checkout(self):
+
+        if len(self) == 0:
+            return
 
         first_customer = self._customers[0]
         current_time = self._store._elapsed_time
