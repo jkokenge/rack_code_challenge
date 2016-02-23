@@ -8,7 +8,7 @@ class test_customers(unittest.TestCase):
 
     def setUp(self):
 
-        lst1 = Helper.getFileContents("inputFiles/ex2.txt")
+        lst1 = Helper.getFileContents("inputFiles/ex5.txt")
 
         self.store = GroceryStore()
 
@@ -39,10 +39,12 @@ class test_customers(unittest.TestCase):
 
         for i, each in enumerate(self.custs):
 
-            if i % 2 == 0:
-                self.assertTrue( isinstance(each, TypeACustomer) )
-            else:
+            if i == 3:
                 self.assertTrue( isinstance(each, TypeBCustomer) )
+            else:
+                self.assertTrue( isinstance(each, TypeACustomer) )
+        #end loop
+            
     #end method
 
     def test_integration(self):
@@ -51,17 +53,33 @@ class test_customers(unittest.TestCase):
             
             ct = self.store.incrementTime()
 
+            currentArrivals = self.store.checkArrivals(ct, self.store.customers)
+
             for each in self.store.registers:
                 each.checkout()
+            #end loop
 
-            currentArrivals = self.store.checkArrivals(ct, self.store.customers)
-            whoPicks = self.store.whoPicks(currentArrivals)
-
-            if whoPicks:
-                register = whoPicks.pickLine(self.store.registers)
-                register.addCustomer(whoPicks)
+            if len(currentArrivals) > 1:
+                
+                for each in currentArrivals:
+                    register = each.pickLine(self.store.registers)
+                    register.addCustomer(each)
+                #end loop
             else:
-                register = self.store._registers[0]
+
+                whoPicks = self.store.whoPicks(currentArrivals)
+            
+                if whoPicks != False:
+                
+                    register = whoPicks.pickLine(self.store.registers)
+                    register.addCustomer(whoPicks)
+                #end if
+            #end if/else            
+
+            #print("elapsed time is {0} \n{1}".format(ct, self.store))
+
+            #if ct < 16:
+            #    x = raw_input("")
 
         #end loop
 

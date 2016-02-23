@@ -51,6 +51,10 @@ class test_customers(unittest.TestCase):
 
             currentArrivals = self.store.checkArrivals(ct, self.store.customers)
 
+            for each in self.store.registers:
+                each.checkout()
+            #end loop
+
             if len(currentArrivals) > 1:
                 
                 for each in currentArrivals:
@@ -66,16 +70,12 @@ class test_customers(unittest.TestCase):
                     register = whoPicks.pickLine(self.store.registers)
                     register.addCustomer(whoPicks)
                 #end if
-            #end if/else
+            #end if/else            
 
-            for each in self.store.registers:
-                each.checkout()
-            #end loop
+            #print("elapsed time is {0} \n{1}".format(ct, self.store))
 
-            print("elapsed time is {0} \n{1}".format(ct, self.store))
-
-            if ct < 16:
-                x = raw_input("")
+            #if ct < 16:
+            #    x = raw_input("")
 
         #end loop
 
