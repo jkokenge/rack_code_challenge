@@ -5,6 +5,8 @@ Table Of Contents:
     3. Customer
     4. TypeACustomer
     5. TypeBCustomer
+    5. Cashier
+    6. TrainingCashier
 """
 import os
 
@@ -294,6 +296,15 @@ class TypeBCustomer(Customer):
 
 
 class Cashier(object):
+
+    """ !5. Cashier Methods
+            a.) __init__ : takes an index and a GroceryStore
+            b.) addCustomer : adds a customer to the line
+            c.) removeCustomer : removes the customer from the store and the line
+                after adding when that customer left to the _time_per_customer list
+            d.) isEmpty : checks if this line has customers or not
+            e.) checkout : calculates if an item has been processed 
+                and removes the current customer if they have no items left """
     
     def __init__(self, num, store):
         self._num = int(num)
@@ -306,6 +317,9 @@ class Cashier(object):
     #end constructor
 
     def addCustomer(self, c):
+
+        """ @param c : Customer """
+
         self._customers.append(c)
     #end method
 
@@ -336,9 +350,10 @@ class Cashier(object):
         current_time = self._store._elapsed_time
         remove_item = False
         
-        #TO DO: figure out how to ensure transition to new customer doesn't automatically remove an item
+        #if the first customer in line did NOT just arrive
         if current_time != first_customer._arrived:
 
+            #if a customer has already come and gone
             if len(self._time_per_customer) > 0:
                 
                 time_since_last_left = current_time - self._time_per_customer[-1]
@@ -375,13 +390,8 @@ class Cashier(object):
 class TrainingCashier(Cashier):
 
     def __init__(self, num, store):
-        self._num = int(num)
-        self._store = store
+        super(TrainingCashier, self).__init__(num, store)
         self._time_per_item = 2
-        self._customers = []
-        self._time_per_customer = []
-        self._arrival_times = []        
-        self._isEmpty = True
-    #end constructor
+    #end constructor    
 
 #end class
